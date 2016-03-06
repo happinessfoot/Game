@@ -5,23 +5,32 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import shamsutdinov.samolovskih.game.states.GameStateManager;
+import shamsutdinov.samolovskih.game.states.MenuState;
 
 public class FlappyDemo extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
+	//Размеры экрана
+	public static final int WIDTH = 480;
+	public static final int HEIGHT = 800;
+
+	public static final String TITLE = "Flappy Demo";
+
+	private GameStateManager gameStateManager;
+	private SpriteBatch batch;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		gameStateManager = new GameStateManager();
+		Gdx.gl.glClearColor(1, 0, 0, 1);//очищает экран
+		gameStateManager.push(new MenuState(gameStateManager));//создает новый экран меню и помещает его в вершину стека
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+		gameStateManager.update(Gdx.graphics.getDeltaTime());//Возвращает время, которое прошло между последним и текущем кадром в секундах
+		gameStateManager.render(batch);
+
 	}
 }
