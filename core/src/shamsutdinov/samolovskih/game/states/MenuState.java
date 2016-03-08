@@ -15,6 +15,7 @@ public class MenuState extends State {
 
     public MenuState(GameStateManager gameStateManager) {
         super(gameStateManager);
+        camera.setToOrtho(false, FlappyDemo.WIDTH / 2, FlappyDemo.HEIGHT / 2);
         background = new Texture("bg.png");
         playButton = new Texture("playbtn.png");
     }
@@ -33,9 +34,10 @@ public class MenuState extends State {
     //Рисуем экран
     @Override
     public void render(SpriteBatch spriteBatch) {
+        spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        spriteBatch.draw(background, 0, 0, FlappyDemo.WIDTH, FlappyDemo.HEIGHT);//фон
-        spriteBatch.draw(playButton, (FlappyDemo.WIDTH / 2) - (playButton.getWidth() / 2), FlappyDemo.HEIGHT / 2);//кнопка PLAY
+        spriteBatch.draw(background, 0, 0);//фон
+        spriteBatch.draw(playButton, camera.position.x - playButton.getWidth() / 2, camera.position.y);//кнопка PLAY
         spriteBatch.end();
     }
 
