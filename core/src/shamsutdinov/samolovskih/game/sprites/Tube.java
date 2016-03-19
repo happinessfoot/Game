@@ -14,15 +14,17 @@ public class Tube {
     public static final int TUBE_WIDTH = 52;
 
     public static final int FLUCTUATION = 130;//Диапозон в котором будут создаваться трубы по высоте
-    public static final int TUBE_GAP = 100; //Высота просвета, ну в которую может птичка пролететь :D
+    public static final int TUBE_GAP = 80; //Высота просвета, ну в которую может птичка пролететь :D
     public static final int LOWEST_OPENING = 120; //Нижняя граница просвета
 
     private Texture topTube;
     private Texture bottomTube;
     private Vector2 positionTopTube;
     private Vector2 positionBottomTube;
+    private Vector2 postionGap;
+    private Vector2 gap;
     private Random random;
-    private Rectangle boundsTop, boundsBottom;
+    private Rectangle boundsTop, boundsBottom,boundsMiddle;
 
 
     public Texture getTopTube() {
@@ -46,13 +48,14 @@ public class Tube {
         topTube = new Texture("toptube.png");
         bottomTube = new Texture("bottomtube.png");
         random = new Random();
-
         //Верхняя труба создается по рандому, нижняя труба будет созадваться на фиксированной высте
         positionTopTube = new Vector2(x, random.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING);
         positionBottomTube = new Vector2(x, positionTopTube.y - TUBE_GAP - bottomTube.getHeight());
 
+
         boundsTop = new Rectangle(positionTopTube.x,positionTopTube.y, topTube.getWidth(), topTube.getHeight()); //верхний премоугольник для проверки стокновения
         boundsBottom = new Rectangle(positionBottomTube.x, positionBottomTube.y, bottomTube.getWidth(), bottomTube.getHeight()); //нижний премоугольник для проверки столкновения
+        boundsMiddle = new Rectangle(positionBottomTube.x,positionBottomTube.y,bottomTube.getWidth(), bottomTube.getHeight() + TUBE_GAP);
     }
     //Что делает метод, вроде как из названия понятно :D
     public void reposition(float x){
@@ -65,7 +68,12 @@ public class Tube {
     }
 
     public boolean collides(Rectangle player){
+
         return player.overlaps(boundsTop) || player.overlaps(boundsBottom);
+    }
+
+    public boolean collideGap(Rectangle player){
+        return  player.overlaps(boundsMiddle);
     }
 
     public void dispose(){

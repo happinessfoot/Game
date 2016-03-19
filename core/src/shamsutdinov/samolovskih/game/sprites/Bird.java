@@ -22,7 +22,6 @@ public class Bird {
         velocity = new Vector3(0, 0, 0);
         bird = new Texture("bird.png");
         bounds = new Rectangle(x, y, bird.getWidth(), bird.getHeight());
-
     }
 
     public Texture getBird() {

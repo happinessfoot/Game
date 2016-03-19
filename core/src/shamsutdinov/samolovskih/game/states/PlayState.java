@@ -1,7 +1,9 @@
 package shamsutdinov.samolovskih.game.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -14,29 +16,32 @@ import shamsutdinov.samolovskih.game.sprites.Tube;
  */
 public class PlayState extends State {
 
-    public static final int TUBE_SPACING = 125; //Растояние между трубами
-    public static final  int TUBE_COUNT = 4;
+    public static final int TUBE_SPACING = 110; //Растояние между трубами
+    public static final  int TUBE_COUNT = 50;
     private static final int GROUND_Y_OFFSET = -30; // уменьшили высоту земли:D
 
     private Bird bird;
     private Texture background;
     private Texture ground;
     private Vector2 groundPosition1, groundPosition2;
+    private BitmapFont font;
+    private int passes = 0;
 
     private Array<Tube> tubes;
 
     public PlayState(GameStateManager gameStateManager) {
         super(gameStateManager);
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
         bird = new Bird(50, 300);
         camera.setToOrtho(false, FlappyDemo.WIDTH / 2, FlappyDemo.HEIGHT / 2); //Задаем область обзора для камеры
         background = new Texture("bg.png");
         ground = new Texture("ground.png");
         groundPosition1 = new Vector2(camera.position.x - camera.viewportWidth / 2, GROUND_Y_OFFSET);
         groundPosition2 = new Vector2((camera.position.x - camera.viewportWidth / 2) + ground.getWidth(), GROUND_Y_OFFSET);
-
         tubes = new Array<Tube>();
 
-        for (int i = 0; i < TUBE_COUNT; i++){
+        for (int i = 1; i < TUBE_COUNT; i++){
             tubes.add(new Tube(i * (TUBE_SPACING + Tube.TUBE_WIDTH)));
         }
     }
@@ -66,6 +71,11 @@ public class PlayState extends State {
             //проверка столкновения (если оно произошло игра просто перезапусится)
             if (tube.collides(bird.getBounds()))
                 gameStateManager.set(new GameOver(gameStateManager));
+            if(tube.collideGap(bird.getBounds())){
+                passes++;
+            }
+
+
         }
         camera.update();
     }
@@ -77,6 +87,7 @@ public class PlayState extends State {
         spriteBatch.begin();
         spriteBatch.draw(background, camera.position.x - (camera.viewportWidth / 2), 0);//Рисуем фон
         spriteBatch.draw(bird.getBird(), bird.getPosition().x, bird.getPosition().y);//Рисуем птичку
+
         for (Tube tube : tubes) {
             spriteBatch.draw(tube.getTopTube(), tube.getPositionBottomTube().x, tube.getPositionTopTube().y);
             spriteBatch.draw(tube.getBottomTube(), tube.getPositionBottomTube().x, tube.getPositionBottomTube().y);
@@ -84,6 +95,7 @@ public class PlayState extends State {
 
         spriteBatch.draw(ground, groundPosition1.x, groundPosition1.y);
         spriteBatch.draw(ground, groundPosition2.x, groundPosition2.y);
+        font.draw(spriteBatch, "Score: " + passes, bird.getPosition().x - 40 ,400);
         spriteBatch.end();
     }
 
@@ -91,6 +103,7 @@ public class PlayState extends State {
     public void dispose() {
         background.dispose();
         bird.dispose();
+        font.dispose();
         ground.dispose();
 
         for (Tube tube : tubes) {
